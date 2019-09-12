@@ -1,0 +1,126 @@
+﻿@model IEnumerable<Api_Ajax_Demo.Models.Customers>
+
+@{
+    ViewBag.Title = "Index";
+}
+
+<h2>Index</h2>
+
+<p>
+    @Html.ActionLink("Create New", "Create")
+</p>
+<div id="Panel"></div>
+@*<table class="table" id="tbl">@*  *@
+@*<tr>
+        <th>
+            @Html.DisplayNameFor(model => model.Name)
+        </th>
+        <th>
+            @Html.DisplayNameFor(model => model.Address)
+        </th>
+        <th>
+            @Html.DisplayNameFor(model => model.MobileNo)
+        </th>
+        <th>
+            @Html.DisplayNameFor(model => model.EmailId)
+        </th>
+        <th></th>
+    </tr>*@
+
+@*@foreach (var item in Model)
+    {
+        <tr>
+            <td>
+                @Html.DisplayFor(modelItem => item.Name)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.Address)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.MobileNo)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.EmailId)
+            </td>
+            <td>
+                @Html.ActionLink("Edit", "Edit", new { id = item.Customer_Id }) |
+                @Html.ActionLink("Details", "Details", new { id = item.Customer_Id }) |
+                @Html.ActionLink("Delete", "Delete", new { id = item.Customer_Id })
+            </td>
+        </tr>
+    }*@
+
+@*</table>*@
+@section Scripts {
+    @Scripts.Render("~/bundles/jqueryval")
+
+    <script type="text/javascript" src="https://code.jquery.com/jquery-1.12.4.js"></script>
+    <script type="text/javascript">
+        $(document).ready(function () {
+            $.ajax({
+                type: "GET",
+                url: "/api/Customers",
+                contentType: "application/json; charset=utf-8",
+                dataType: "json",
+                success: function (data) {
+                    var $table = $('<table/>').addClass('dataTable table table-bordered table-striped');
+                    var $header = $('<thead/>').html('<tr><th>Name</th><th> Address</th > <th>MobileNo</th> <th>EmailId</th> <th>Delete</th><th>Edit</th> </tr >');
+                    $table.append($header);
+                    $.each(data, function (i, val) {
+                        var $row = $('<tr id="' + val.Customer_Id + '" />');
+                        $row.append($('<td/>').html(val.Name));
+                        $row.append($('<td/>').html(val.Address));
+                        $row.append($('<td/>').html(val.MobileNo));
+                        $row.append($('<td/>').html(val.EmailId));
+                        var btnRemove = $("<input />");
+                        btnRemove.attr("type", "submit");
+                        btnRemove.attr("class", "btn  btn-success");
+                        btnRemove.attr("onclick", "DeleteSuccess('" + val.Customer_Id + "');");
+                        btnRemove.val("Remove");
+                        btnRemove.attr("id", val.Customer_Id);
+                        $row.append($('<td/>').html(btnRemove));
+
+
+                        var btnEdit = $("<input />");
+                        btnEdit.attr("type", "submit");
+                        btnEdit.attr("class", "btn  btn-success");
+                        btnEdit.attr("onclick", "EditSuccess('" + val.Customer_Id + "');");
+                        btnEdit.val("Edit");
+                        btnEdit.attr("id", val.Customer_Id);
+                        $row.append($('<td/>').html(btnEdit));
+
+                        $table.append($row);
+                    });
+                    $('#Panel').html($table);
+                },
+                error: function () {
+                    alert('Error!');
+                }
+            });
+        });
+    </script>
+    <script>
+        function DeleteSuccess(rowid) {
+            var customers = {};
+            customers.Customer_Id = rowid;
+            $('#' + rowid).remove();
+            $.ajax({
+                type: "DELETE",
+                url: "/api/Customers/" + rowid,
+                contentType: "application/json; charset=utf-8",
+                dataType: "json",
+                success: function (data) {
+                    console.log("Success" + data);
+                    //
+                    alert('Record is Removed...');
+                }
+            });
+        }
+    </script>
+    <script>
+        function EditSuccess(rowid) {
+            window.location.href = "/Customers/Edit/" +rowid;
+        }
+    </script>
+
+}
